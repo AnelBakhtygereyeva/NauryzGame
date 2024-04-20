@@ -67,8 +67,7 @@ def main():
                     import lvl1
                     lvl1.main()
                 if helpRect.collidepoint(event.pos):
-                    import lvl1
-                    lvl1.main2()
+                    pass
                 if exitRect.collidepoint(event.pos):
                     pygame.quit()
                     sys.exit()
