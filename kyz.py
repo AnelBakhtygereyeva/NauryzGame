@@ -23,12 +23,12 @@ def main():
     DISPLAYSURF = pygame.display.set_mode((W, H))
 
     # Load images for boy
-    imBoyDefault = pygame.transform.scale(pygame.image.load("images/boy.png"), (500, 400))
-    imBoyMoved = pygame.transform.scale(pygame.image.load("images/boyMove.png"), (500, 400))
+    imBoyDefault = pygame.transform.scale(pygame.image.load("images/boy.png"), (400, 350))
+    imBoyMoved = pygame.transform.scale(pygame.image.load("images/boyMove.png"), (400, 350))
 
     # Load images for girl
-    imGirlDefault = pygame.transform.scale(pygame.image.load("images/girl.png"), (500, 400))
-    imGirlMoved = pygame.transform.scale(pygame.image.load("images/girlMove.png"), (500, 400))
+    imGirlDefault = pygame.transform.scale(pygame.image.load("images/girl.png"), (400, 350))
+    imGirlMoved = pygame.transform.scale(pygame.image.load("images/girlMove.png"), (400, 350))
 
     while True:
         for event in pygame.event.get():
@@ -37,8 +37,8 @@ def main():
             if event.type == pygame.KEYDOWN:
                 if event.key == K_RIGHT:
                     # Check if moving right will exceed the 1200 pixels width border for the boy
-                    if boy_x + 50 < 1200:
-                        boy_x += 50
+                    if boy_x + 17 < 1200:
+                        boy_x += 17
                         image_toggle = not image_toggle
                     else:
                         # Change the screen to green for 1 second
@@ -46,15 +46,15 @@ def main():
                         pygame.display.update()  # Update the display to show the new color
                         pygame.time.delay(1000)  # Wait for 1 second
 
-                        import asyk
-                        asyk.main()
+                        import lvl1
+                        lvl1.main2()
                     
 
         # Automate girl's movement and image toggle
         auto_move_counter += 1
         if auto_move_counter % 8 == 0:  # Change girl's position and image every 60 frames (~1 second at 60 FPS)
-            if girl_x + 50 <= 1150:  # Move girl to the right
-                girl_x += 50  # Reset girl's position if it exceeds the right border
+            if girl_x + 20 <= 1150:  # Move girl to the right
+                girl_x += 20  # Reset girl's position if it exceeds the right border
                 girl_image_toggle = not girl_image_toggle
 
         background = pygame.transform.scale(pygame.image.load("images/tree/frame1.png"), (1400, 800))
@@ -77,13 +77,10 @@ def main():
         DISPLAYSURF.blit(imGirl, girlRect)
 
         boyRect = imBoy.get_rect()
-        boyRect.center = (boy_x, 600)
+        boyRect.center = (boy_x, 650)
         DISPLAYSURF.blit(imBoy, boyRect)
 
 
 
         pygame.display.update()
         Clock.tick(FPS)
-
-if __name__ == "__main__":
-    main()
