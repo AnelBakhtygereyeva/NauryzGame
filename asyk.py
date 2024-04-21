@@ -1,6 +1,7 @@
 import pygame 
 import random
 import math
+import time
 
 def main():
     pygame.init()
@@ -12,7 +13,11 @@ def main():
     clock = pygame.time.Clock()
     done = False
     bg = pygame.transform.scale(pygame.image.load("images/kover.png"), (1400, 800))
-    transparent_layer = (255,255,255,128)
+    fail = pygame.transform.scale(pygame.image.load("images/fail.png"), (1400, 800))
+    good = pygame.transform.scale(pygame.image.load("images/good.png"), (1400, 800))
+    kids = pygame.mixer.Sound("sounds/asykBg.mp3")
+    kids.set_volume(0.6)
+    kids.play()
 
     #paddle
     paddleW = 150
@@ -21,20 +26,17 @@ def main():
     paddle = pygame.Rect(W // 2 - paddleW // 2, H - paddleH - 30, paddleW, paddleH)
 
 
-    #Ball
+    #ball as asyk
     ballRadius = 20
     ballSpeed = 6
     ball_rect = int(ballRadius * 20 ** 0.5)
     ball = pygame.Rect(random.randrange(ball_rect, W - ball_rect), H // 2, ball_rect, ball_rect)
+    asykLying_image = pygame.transform.scale(pygame.image.load("images/asykLying.png"), (400,350))
     asyk_image = pygame.transform.scale(pygame.image.load("images/asyk2.png"), (150,150))
     dx, dy = 1, -1
 
-    #Game score
-    game_score = 0
-    game_score_fonts = pygame.font.SysFont('comicsansms', 40)
-
     #sound
-    collision_sound = pygame.mixer.Sound('ackanoid/catch.mp3')
+    collision_sound = pygame.mixer.Sound('sounds/asyk.wav')
 
     def detect_collision(dx, dy, ball, rect):
         if dx > 0:
@@ -55,39 +57,22 @@ def main():
         return dx, dy
 
 
-    #block settings initializing
+    #block settings
     block_list = []
-    image_list = []
 
     rows = 1
     columns = 7
 
-    # Calculate the starting x-coordinate to center the blocks
+    #starting position
     start_x = (W - (columns * 215 + (columns - 1))) // 2
-    start_y = - 60 # Adjust the starting y-coordinate to position at the top
+    start_y = - 60
 
-    for i in range(rows):
-        for j in range(columns):
-            if j % 2 == 0:
-                block = pygame.Rect(start_x + (180) * j, start_y, 180, 100)  # Placing blocks at the top
-                image = pygame.transform.scale(pygame.image.load("images/asykLying.png"), (400, 300))
-            else:
-                block = pygame.Rect(start_x + (180) * j, start_y, 180, 100)  # Placing blocks at the top
-                image = pygame.transform.scale(pygame.image.load("images/asyk.png"), (400, 300))
-            block_list.append(block)
-            image_list.append(image)
+    for i in range(columns):
+        block = pygame.Rect(start_x + (190) * i, start_y, 180, 100)
+        asykImage = pygame.transform.scale(pygame.image.load("images/asyk.png"), (400, 350))
+        block_list.append((block,asykImage, 0)) 
 
-    #Game over Screen
-    losefont = pygame.font.SysFont('comicsansms', 40)
-    losetext = losefont.render('Qaytadan basta :(', True, (255, 255, 255))
-    losetextRect = losetext.get_rect()
-    losetextRect.center = (W // 2, H // 2)
-
-    #Win Screen
-    winfont = pygame.font.SysFont('comicsansms', 40)
-    wintext = losefont.render('Zharaysyn', True, (0, 0, 0))
-    wintextRect = wintext.get_rect()
-    wintextRect.center = (W // 2, H // 2)
+    block_hits = [0] * len(block_list)
 
     last_time = pygame.time.get_ticks()
 
@@ -101,19 +86,14 @@ def main():
         screen.blit(bg, (0,0))      
 
         current_time = pygame.time.get_ticks()
-        elapsed_time = (current_time - last_time) / 1000  # Convert milliseconds to seconds
+        elapsed_time = (current_time - last_time) / 1000  #converting milliseconds to seconds
         last_time = current_time
 
-        # Increase ball speed over time
+        #increasing speed of the ball with time
         ballSpeed += elapsed_time * 0.1
 
-
-        # Update paddle rectangle
-
-        
-
         #drawing the blocks
-        for block in block_list:
+        for block, image, hits in block_list:
             screen.blit(image, block)
 
         #drawing the paddle
@@ -122,42 +102,54 @@ def main():
         screen.blit(asyk_image, ball)
 
 
-        #Ball movement
+        #ball movement
         ball.x += ballSpeed * dx
         ball.y += ballSpeed * dy
 
-        #Collision left 
+        #collision left 
         if ball.centerx < ballRadius or ball.centerx > W - ballRadius:
             dx = -dx
-        #Collision top
+        #collision top
         if ball.centery < ballRadius + 50: 
             dy = -dy
-        #Collision with paddle
+        #collision with paddle
         if ball.colliderect(paddle) and dy > 0:
             dx, dy = detect_collision(dx, dy, ball, paddle)
 
-        #Collision blocks
-        hitIndex = ball.collidelist(block_list)
+        #collision with blocks
+        for i, (block, image, hits) in enumerate(block_list):
+            if ball.colliderect(block):
+                if hits == 0:
+                    block_list[i] = (block, asykLying_image, 1)  #changing image and mark after first hit
+                elif hits == 1:
+                    block_list.pop(i)  #removing after second hit
+                    collision_sound.play()
+                    break
+                dx, dy = detect_collision(dx, dy, ball, block)
+                collision_sound.play()
 
-        if hitIndex != -1:
-            hitRect = block_list[hitIndex]
-            block_list.pop(hitIndex)  # Remove the hit block from the list
-            dx, dy = detect_collision(dx, dy, ball, hitRect)
-            game_score += 1
-            collision_sound.play()
-        #Game score
-#        game_score_text = game_score_fonts.render(f'asyks {game_score}', True, (255, 255, 255))
-#        screen.blit(game_score_text, (50, 40))
-
-        #Win/lose screens
         if (ball.bottom > H) and (len(block_list) > 0):
-            screen.fill((0, 0, 0))
-            screen.blit(losetext, losetextRect)
+            kids.stop()
+            screen.blit(fail, (0,0))
+            pygame.mixer.Sound("sounds/fail.mp3").play().set_volume(0.5)
+            pygame.display.update()
+            pygame.time.delay(1500)
+
+            import levels
+            levels.main2()
+
+
         elif not len(block_list):
-            screen.fill((255,255, 255))
-            screen.blit(wintext, wintextRect)
+            kids.stop()
+            screen.blit(good, (0,0))
+            pygame.mixer.Sound("sounds/success.wav").play()
+            pygame.display.update()
+            pygame.time.delay(1500)
+
+            import levels
+            levels.main3()
         
-        #Paddle Control
+        #paddle Control
         key = pygame.key.get_pressed()
         if key[pygame.K_LEFT] and paddle.left > 0:
             paddle.left -= paddleSpeed
