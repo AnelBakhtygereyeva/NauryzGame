@@ -190,22 +190,18 @@ def main():
             for sprite in good_sprites:
                 if pygame.sprite.collide_rect(girl, sprite):
                     if sprite == besh_cube:
-                        pygame.mixer.Sound("ackanoid/catch.mp3").play()
                         besh_cube.rect.center = (width // 2, height // 2 + 25)
                         count += 1
                         pygame.mixer.Sound("sounds/food.mp3").play()
                     elif sprite == baursak:
-                        pygame.mixer.Sound("ackanoid/catch.mp3").play()
                         baursak.rect.center = (width // 2 + 100, height // 2 - 80)
                         count += 1
                         pygame.mixer.Sound("sounds/food.mp3").play()
                     elif sprite == kurt:
-                        pygame.mixer.Sound("ackanoid/catch.mp3").play()
                         kurt.rect.center = (width // 2 - 10, height // 2 + 120)
                         count += 1
                         pygame.mixer.Sound("sounds/food.mp3").play()
                     elif sprite == kozhe:
-                        pygame.mixer.Sound("ackanoid/catch.mp3").play()
                         kozhe.rect.center = (width // 2 - 100, height // 2 - 80)
                         count += 1
                         pygame.mixer.Sound("sounds/food.mp3").play()
