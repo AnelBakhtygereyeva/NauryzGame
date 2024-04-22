@@ -121,7 +121,7 @@ def main():
     bad_sprites = pygame.sprite.Group()
     dastarkhan_sprites = pygame.sprite.Group()
 
-    all_sprites.add(girl, burger, dastarkhan, besh_cube, burger, baursak, kozhe, pizza, kurt, donut, bomb1, bomb2, bomb3, bomb4, bomb5, bomb6, bomb7)
+    all_sprites.add(dastarkhan, girl, burger, besh_cube, burger, baursak, kozhe, pizza, kurt, donut, bomb1, bomb2, bomb3, bomb4, bomb5, bomb6, bomb7)
 
     #to iterate through it (saves time)
     food = [besh_cube, burger, baursak, burger, baursak, kozhe, pizza, kurt, donut]
